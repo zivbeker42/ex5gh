@@ -1,6 +1,4 @@
 package fileprocessing;
-import
-
 import java.io.File;
 import java.util.Comparator;
 
@@ -13,4 +11,11 @@ public class Section {
         this.order = order;
     }
 
+    private Filterable getFilter() {
+        return filter;
+    }
+
+    private Comparator<File> getOrder() {
+        return order;
+    }
 }
