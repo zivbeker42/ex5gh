@@ -1,4 +1,4 @@
-package fileprocessing;
+package fileprocessing.filters;
 
 import java.io.File;
 
@@ -6,7 +6,7 @@ import java.io.File;
  * A class implementing a filter that passes only files that their size (in kb) is strictly bigger than a
  * certain lower bound.
  */
-public class greater_thanFilter implements Filterable{
+public class greater_thanFilter implements Filterable {
 
     /* The lower bound of the file size that passes this filter.*/
     private double lowerBound;
