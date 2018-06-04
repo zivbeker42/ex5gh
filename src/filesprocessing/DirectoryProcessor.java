@@ -46,7 +46,7 @@ public class DirectoryProcessor {
         Filtered.sort(s.getOrder());
 
         //print by order
-        while(Filtered.isEmpty()){
+        while(!Filtered.isEmpty()){
             System.out.println(Filtered.getFirst().getName());
             Filtered.removeFirst();
         }
