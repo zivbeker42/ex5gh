@@ -10,7 +10,7 @@ public class allFilter implements Filterable {
     /**
      * Creates a new all filter.
      */
-    private allFilter(String type) { }
+    public allFilter() { }
 
     @Override
     public boolean filter(File file) {

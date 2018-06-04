@@ -1,8 +1,7 @@
 package fileprocessing;
 
 import com.sun.org.apache.xpath.internal.operations.Or;
-import fileprocessing.filters.Filterable;
-import fileprocessing.filters.numbersFilter;
+import fileprocessing.filters.*;
 import fileprocessing.orderTypes.Orders;
 
 import java.io.File;
@@ -44,7 +43,7 @@ public class SectionFactory {
     private static Comparator<File> interpretOrder(String line, int i) {
         if (line.matches(".*#REVERSED")) {
             int j = line.indexOf("#REVERSED");
-            String newline = line.substring(0,j);
+            String newline = line.substring(0, j);
             return interpretOrder(newline, i).reversed();
         } else {
             if (line.matches("abs")) {
@@ -85,25 +84,42 @@ public class SectionFactory {
             if (value1 < value2 & 0 < value1)
                 return new numbersFilter(Filterable.filterType.BETWEEN, value1, value2);
         } else if (line.matches("smaller_than#((\\d)+(\\.\\d+)?)")) {
+            String stringValue = line.split("#")[1];
+            double value = Double.valueOf(stringValue);
+            return new numbersFilter(Filterable.filterType.SMALLER_THAN, value);
 
         } else if (line.matches("file#[\\w\\s/\\-\\.]+")) {
+            String stringValue = line.split("#")[1];
+            return new stringFilters(Filterable.filterType.FILE, stringValue);
 
         } else if (line.matches("contains#((\\d)+(\\.\\d+)?)")) {
+            String stringValue = line.split("#")[1];
+            return new stringFilters(Filterable.filterType.CONTAINS, stringValue);
 
         } else if (line.matches("prefix#((\\d)+(\\.\\d+)?)")) {
+            String stringValue = line.split("#")[1];
+            return new stringFilters(Filterable.filterType.PREFIX, stringValue);
 
         } else if (line.matches("suffix#((\\d)+(\\.\\d+)?)")) {
+            String stringValue = line.split("#")[1];
+            return new stringFilters(Filterable.filterType.SUFFIX, stringValue);
 
         } else if (line.matches("writable#(YES|NO)")) {
+            String stringValue = line.split("#")[1];
+            return new permissionFilter(Filterable.filterType.WRITABLE, stringValue);
 
         } else if (line.matches("executable#(YES|NO)")) {
+            String stringValue = line.split("#")[1];
+            return new permissionFilter(Filterable.filterType.EXECUTABLE, stringValue);
 
         } else if (line.matches("hidden#(YES|NO)")) {
+            String stringValue = line.split("#")[1];
+            return new permissionFilter(Filterable.filterType.HIDDEN, stringValue);
 
         } else if (line.matches("all")) {
 
         }
-        return null;
+        return new allFilter();
     }
 
     private static void validateFilter(String line, int i) {
