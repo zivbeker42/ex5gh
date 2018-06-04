@@ -4,10 +4,11 @@ import java.io.File;
 
 
 /**
- * an interface describing what a filter class must implement
+ * an interface describing what each filter class must implement.
  */
 public interface Filterable {
 
+    /*the filter types.*/
     public enum filterType {FILE, CONTAINS, PREFIX, SUFFIX, HIDDEN, EXECUTABLE, WRITABLE, GREATER_THAN,
             SMALLER_THAN, BETWEEN}
     /**
