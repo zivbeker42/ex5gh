@@ -14,8 +14,8 @@ public class betweenFilter implements Filterable{
 
     /**
      * Creates a new greater then filter.
-     * @param lowerBound The lower bound of the between filter
-     * @param upperBound The upper bound of the between filter.
+     * @param lowerBound The lower bound of the BETWEEN filter
+     * @param upperBound The upper bound of the BETWEEN filter.
      */
     public betweenFilter (double lowerBound, double upperBound) throws Exception{
         if(upperBound < lowerBound)
