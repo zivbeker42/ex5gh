@@ -1,7 +1,6 @@
-package fileprocessing.filters;
+package filesprocessing.filters;
 
 import java.io.File;
-import java.util.logging.Filter;
 
 /**
  * A class implementing a filter that is described by a lower bound and/or an upper bound of the file size.

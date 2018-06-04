@@ -1,8 +1,7 @@
-package fileprocessing;
+package filesprocessing;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
-import fileprocessing.filters.*;
-import fileprocessing.orderTypes.Orders;
+import filesprocessing.filters.*;
+import filesprocessing.orderTypes.Orders;
 
 import java.io.File;
 import java.io.FileNotFoundException;

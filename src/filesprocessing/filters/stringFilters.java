@@ -1,7 +1,6 @@
-package fileprocessing.filters;
+package filesprocessing.filters;
 
 import java.io.File;
-import java.util.Arrays;
 
 /**
  * A class implementing a filter that is described by a string checking the file's name. Meaning it is

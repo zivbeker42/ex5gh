@@ -1,4 +1,4 @@
-package fileprocessing.orderTypes;
+package filesprocessing.orderTypes;
 
 import java.io.File;
 import java.util.Comparator;
