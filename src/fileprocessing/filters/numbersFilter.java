@@ -23,16 +23,13 @@ public class numbersFilter implements Filterable{
      * @param value the value of the filter.
      * @throws Exception iff type is not describing a numbers filter
      */
-    public numbersFilter(Filterable.filterType type, double value) throws Exception{
+    public numbersFilter(Filterable.filterType type, double value){
         this.type = type;
         if(this.type == Filterable.filterType.GREATER_THAN){
             this.minValue = value;
         }
         else if(this.type == Filterable.filterType.SMALLER_THAN){
             maxValue = value;
-        }
-        else{
-            throw new Exception("not a valid type");
         }
 
     }
@@ -44,17 +41,11 @@ public class numbersFilter implements Filterable{
      * @param max the max value of the filter.
      * @throws Exception iff max value is smaller than min
      */
-    public numbersFilter(Filterable.filterType type, double min, double max) throws Exception {
+    public numbersFilter(Filterable.filterType type, double min, double max) {
         this.type = type;
         if(this.type == Filterable.filterType.BETWEEN){
             this.minValue = min;
             this.maxValue = max;
-            if (minValue > maxValue){
-                throw new Exception("max is smaller than min");
-            }
-        }
-        else{
-            throw new Exception("not a valid type");
         }
     }
 
