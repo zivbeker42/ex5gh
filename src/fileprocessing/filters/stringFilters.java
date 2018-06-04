@@ -8,11 +8,8 @@ import java.util.Arrays;
  */
 public class stringFilters implements Filterable{
 
-    /*The types that are allowed to the strings filters*/
-    private static String[] allowedTypes = {"file", "contains", "suffix", "prefix"};
-
-    /*The type of the filter. can be either "file", "contains", "suffix", "prefix".*/
-    private String type;
+    /*The type of the filter.*/
+    private filterType type;
 
     /*The string that can pass the filter (depending on it's type) .*/
     private String value;
@@ -24,12 +21,10 @@ public class stringFilters implements Filterable{
      * @throws Exception
      */
     public stringFilters(String type, String value) throws Exception{
-        this.type = type;
-        if(Arrays.asList(allowedTypes).contains(type)){
-            this.value = value;
-        }
-        else{
-            throw new Exception("not a type");
+        this.type = new filterType(type);
+        this.value = value;
+        if(!this.type.stringFilter){
+            throw new Exception("not a string type");
         }
 
     }
@@ -37,13 +32,13 @@ public class stringFilters implements Filterable{
 
     @Override
     public boolean filter(File file){
-        if (type.equals("file")){
+        if (type.name == filterType.filterName.FILE){
             return file.getName().equals(value);
         }
-        else if(type.equals("contains")){
+        else if(type.name == filterType.filterName.CONTAINS){
             return file.getName().contains(value);
         }
-        else if(type.equals("suffix")){
+        else if(type.name == filterType.filterName.SUFFIX){
             return file.getName().endsWith(value);
         }
         else {
