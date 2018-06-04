@@ -1,6 +1,7 @@
 package fileprocessing.filters;
 
 import java.io.File;
+import java.util.logging.Filter;
 
 /**
  * A class implementing a filter that is described by a lower bound and/or an upper bound of the file size.
@@ -8,7 +9,7 @@ import java.io.File;
 public class numbersFilter implements Filterable{
 
     /*The type of the filter.*/
-    private filterType type;
+    private Filterable.filterType type;
 
     /*The min value of the file size that can pass greater than and BETWEEN filters.*/
     private double minValue = 0.0;
@@ -22,12 +23,12 @@ public class numbersFilter implements Filterable{
      * @param value the value of the filter.
      * @throws Exception iff type is not describing a numbers filter
      */
-    public numbersFilter(String type, double value) throws Exception{
-        this.type = new filterType(type);
-        if(this.type.name == filterType.filterName.GREATER_THAN){
+    public numbersFilter(Filterable.filterType type, double value) throws Exception{
+        this.type = type;
+        if(this.type == Filterable.filterType.GREATER_THAN){
             this.minValue = value;
         }
-        else if(this.type.name == filterType.filterName.SMALLER_THAN){
+        else if(this.type == Filterable.filterType.SMALLER_THAN){
             maxValue = value;
         }
         else{
@@ -43,9 +44,9 @@ public class numbersFilter implements Filterable{
      * @param max the max value of the filter.
      * @throws Exception iff max value is smaller than min
      */
-    public numbersFilter(String type, double min, double max) throws Exception {
-        this.type = new filterType(type);
-        if(this.type.name == filterType.filterName.BETWEEN){
+    public numbersFilter(Filterable.filterType type, double min, double max) throws Exception {
+        this.type = type;
+        if(this.type == Filterable.filterType.BETWEEN){
             this.minValue = min;
             this.maxValue = max;
             if (minValue > maxValue){
