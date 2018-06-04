@@ -16,11 +16,18 @@ public class Orders {
         return (file1, file2) -> file1.getAbsolutePath().compareTo(file2.getAbsolutePath());
     }
 
-    
+    /**
+     * Creates a type comparator
+     * @return type comparator
+     */
     public static Comparator<File> typeComparator(){
         return (file1, file2) -> getType(file1).compareTo(getType(file2));
     }
 
+    /**
+     * Creates a size comparator
+     * @return size comparator
+     */
     public static Comparator<File> sizeComparator(){
         return new Comparator<File>() {
             @Override
@@ -32,6 +39,11 @@ public class Orders {
         };
     }
 
+    /**
+     * finds and returns the type of a given file (stated as the substring after the last dot).
+     * @param file the given file.
+     * @return the type of the file.
+     */
     private static String getType(File file){
         String path = file.getAbsolutePath();
         return path.substring(path.lastIndexOf('.'));
