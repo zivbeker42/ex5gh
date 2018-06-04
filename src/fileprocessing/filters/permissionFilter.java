@@ -2,12 +2,12 @@ package fileprocessing.filters;
 
 import java.io.File;
 
+/**
+ * A filter responsible for filters of type "writable", "executable", "hidden".
+ */
 public class permissionFilter implements Filterable {
 
-    ///*The types that are allowed to the strings filters*/
-    //private static String[] allowedTypes = {"WRITABLE", "EXECUTABLE", "hidden"};
-
-    /*The type of the filter. can be either "WRITABLE", "EXECUTABLE", "hidden".*/
+    /*The type of the filter. can be either "WRITABLE", "EXECUTABLE", "HIDDEN".*/
     private Filterable.filterType type;
     /*The boolean factor that says whether .*/
     private boolean value;

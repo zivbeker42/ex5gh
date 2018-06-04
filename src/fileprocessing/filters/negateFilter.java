@@ -2,6 +2,9 @@ package fileprocessing.filters;
 
 import java.io.File;
 
+/**
+ * filter which negates any other filter.
+ */
 public class negateFilter implements Filterable {
 
     /* The filter which the negate filter negates.*/
