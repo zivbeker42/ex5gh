@@ -14,6 +14,11 @@ import java.util.Scanner;
 public class SectionFactory {
     private static final int LINESPERSECTION = 4;
     private static final String BUFFERSTRING = "***AUTOMATIC_BUFFER***";
+    private static final String FILTER = "FILTER";
+    private static final String ORDER = "ORDER";
+    private static final String REVERSE = "REVERSE";
+    private static final String NOT = "NOT";
+
 
     public static class Type2Error extends IOException {
     }
@@ -100,8 +105,8 @@ public class SectionFactory {
     }
 
     private static Comparator<File> interpretOrder(String line) throws IOException {
-        if (line.matches(".*#REVERSED")) {
-            int j = line.indexOf("#REVERSED");
+        if (line.matches(".*#"+REVERSE)) {
+            int j = line.indexOf("#"+REVERSE);
             String newline = line.substring(0, j);
             return interpretOrder(newline).reversed();
         } else {
@@ -117,7 +122,7 @@ public class SectionFactory {
     }
 
     private static void validateOrder(String line) throws OrderError {
-        if (!line.equals("ORDER")) {
+        if (!line.equals(ORDER)) {
             throw new OrderError();
         }
 
@@ -125,8 +130,8 @@ public class SectionFactory {
     }
 
     private static Filterable interpretFilter(String line) throws IOException {
-        if (line.matches(".*#NOT")) {
-            int j = line.indexOf("#NOT");
+        if (line.matches(".*#"+NOT)) {
+            int j = line.indexOf("#"+NOT);
             String newline = line.substring(0, j);
             return new negateFilter(interpretFilter(newline));
         } else {
@@ -187,7 +192,7 @@ public class SectionFactory {
     }
 
     private static void validateFilter(String line) throws FilterError {
-        if (!line.equals("FILTER")) {
+        if (!line.equals(FILTER)) {
             throw new FilterError();
         }
     }
