@@ -14,6 +14,11 @@ import java.util.Scanner;
 public class SectionFactory {
     private static final int LINESPERSECTION = 4;
     private static final String BUFFERSTRING = "***AUTOMATIC_BUFFER***";
+    private static final String FILTER = "FILTER";
+    private static final String ORDER = "ORDER";
+    private static final String REVERSE = "REVERSE";
+    private static final String NOT = "NOT";
+
 
     public static class Type2Error extends IOException {
     }
@@ -48,6 +53,7 @@ public class SectionFactory {
         //order content
         Filterable filter = null;
         Comparator<File> order;
+        LinkedList<Type1Exception> errors = new LinkedList<Type1Exception>();
         for (String line : rawtext) {
             int linenum = part % LINESPERSECTION; //this variable saves the part is the section that is being currently
             //obsereved
@@ -61,16 +67,16 @@ public class SectionFactory {
                     throw new OrderError();
                 }
                 try {
-                    filter = interpretFilter(line);
-                } catch (IOException e) {
-                    System.err.println("Warning in line " + linecount);
+                    filter = interpretFilter(line,linecount);
+                } catch (Type1Exception error) {
+                    errors.add(error);
                     filter = getDeafaultFilter();
                 }
             } else if (linenum == 3) {
                 validateOrder(line);
                 if(linecount==len){
                     order=getDeafaultComparator();
-                    lst.add(new Section(filter, order));
+                    lst.add(new Section(filter, order, errors));
                 }
             } else if (linenum == 0) {
                 if (line.equals(BUFFERSTRING)) {
@@ -80,13 +86,13 @@ public class SectionFactory {
                     part++;
                 }else{
                     try {
-                        order = interpretOrder(line);
-                    } catch (IOException error) {
-                        System.err.println("Warning in line " + linecount);
+                        order = interpretOrder(line, linecount);
+                    } catch (Type1Exception error) {
+                        errors.add(error);
                         order = getDeafaultComparator();
                     }
                 }
-                lst.add(new Section(filter, order));
+                lst.add(new Section(filter, order, errors));
             } else {
                 //if in the future more segemets will be present in each section
             }
@@ -99,11 +105,11 @@ public class SectionFactory {
 
     }
 
-    private static Comparator<File> interpretOrder(String line) throws IOException {
-        if (line.matches(".*#REVERSED")) {
-            int j = line.indexOf("#REVERSED");
+    private static Comparator<File> interpretOrder(String line, int linenum) throws Type1Exception {
+        if (line.matches(".*#"+REVERSE)) {
+            int j = line.indexOf("#"+REVERSE);
             String newline = line.substring(0, j);
-            return interpretOrder(newline).reversed();
+            return interpretOrder(newline, linenum).reversed();
         } else {
             if (line.matches("abs")) {
                 return Orders.absComparator();
@@ -113,22 +119,22 @@ public class SectionFactory {
                 return Orders.sizeComparator();
             }
         }
-        throw new IOException();
+        throw new Type1Exception(linenum);
     }
 
     private static void validateOrder(String line) throws OrderError {
-        if (!line.equals("ORDER")) {
+        if (!line.equals(ORDER)) {
             throw new OrderError();
         }
 
 
     }
 
-    private static Filterable interpretFilter(String line) throws IOException {
-        if (line.matches(".*#NOT")) {
-            int j = line.indexOf("#NOT");
+    private static Filterable interpretFilter(String line , int i) throws Type1Exception {
+        if (line.matches(".*#"+NOT)) {
+            int j = line.indexOf("#"+NOT);
             String newline = line.substring(0, j);
-            return new negateFilter(interpretFilter(newline));
+            return new negateFilter(interpretFilter(newline,i));
         } else {
 
             if (line.matches("greater_than#((\\d)+(\\.\\d+)?)")) {
@@ -180,14 +186,14 @@ public class SectionFactory {
             } else if (line.matches("all")) {
                 return new allFilter();
             }
-            throw new IOException();
+            throw new Type1Exception(i);
 
         }
 
     }
 
     private static void validateFilter(String line) throws FilterError {
-        if (!line.equals("FILTER")) {
+        if (!line.equals(FILTER)) {
             throw new FilterError();
         }
     }
