@@ -64,17 +64,15 @@ public class DirectoryProcessor {
         Filtered.sort(s.getOrder());
 
         //print by order
-        while (!Filtered.isEmpty()) {
-            System.out.println(Filtered.getFirst().getName());
-            Filtered.removeFirst();
+        for (File file : Filtered) {
+            System.out.println(file.getName());
         }
 
     }
 
     private static void printWarnings(Section s){
-        while(!s.getErrors().isEmpty()){
-            s.getErrors().getFirst().print();
-            s.getErrors().removeFirst();
+        for(Type1Exception warning : s.getErrors()){
+            warning.print();
         }
     }
 }
