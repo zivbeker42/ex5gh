@@ -5,32 +5,71 @@ import filesprocessing.orderTypes.Orders;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Scanner;
 
 
 public class SectionFactory {
+    public static final int LINESPERSECTION = 4;
+
+
+    public static class Type2Error extends IOException {
+    }
+
+    public static class OrderError extends Type2Error {
+
+    }
+
+    public static class FilterError extends Type2Error {
+    }
 
     public SectionFactory() {
     }
 
-    public static LinkedList<Section> parse(File cmdfile) {
+    public static LinkedList<Section> parse(File cmdfile) throws Type2Error {
         LinkedList<String> rawtext = fileToString(cmdfile);
         LinkedList<Section> lst = new LinkedList<Section>();
-        int i = 0;
+        int len = rawtext.size();
+        LinkedList<String> buffer = new LinkedList<>();
+        /**
+         * this buffer is created in order to force the number of rows to be 4. that way any missing segments
+         * of the command file will be noticed
+         */
+        for (int j=0; j<LINESPERSECTION-1-(len+LINESPERSECTION-1)%LINESPERSECTION;j++){
+            buffer.add("");
+        }
+        rawtext.addAll(buffer);
+
+        int i = 1;
         Filterable filter = null;
         Comparator<File> order;
         for (String line : rawtext) {
-            if (i % 4 == 0) {
+            int linenum = i%LINESPERSECTION; //this variable saves the part is the section that is being currently
+            //obsereved
+            if (linenum== 1) {
                 validateFilter(line, i);
-            } else if (i % 4 == 1) {
-                filter = interpretFilter(line, i);
-            } else if (i % 4 == 2) {
+            } else if (linenum == 2) {
+                try {
+                    filter = interpretFilter(line, i);
+                } catch (IOException e) {
+                    System.err.println("Warning in line " + i);
+                    filter = new allFilter();
+                }
+            } else if (linenum == 3) {
                 validateOrder(line, i);
-            } else if (i % 4 == 3) {
-                order = interpretOrder(line, i);
+            } else if (linenum == 0) {
+                try {
+                    order = interpretOrder(line, i);
+                } catch (IOException error) {
+                    System.err.println("Warning in line " + i);
+                    order = Orders.absComparator();
+                }
                 lst.add(new Section(filter, order));
+            }
+            else{
+                //if in the future more segemets will be present in each section
             }
             i++;
         }
@@ -39,7 +78,7 @@ public class SectionFactory {
 
     }
 
-    private static Comparator<File> interpretOrder(String line, int i) {
+    private static Comparator<File> interpretOrder(String line, int i) throws IOException {
         if (line.matches(".*#REVERSED")) {
             int j = line.indexOf("#REVERSED");
             String newline = line.substring(0, j);
@@ -53,22 +92,18 @@ public class SectionFactory {
                 return Orders.sizeComparator();
             }
         }
-        //throw error
-        return Orders.absComparator();
+        throw new IOException();
     }
 
-    private static void validateOrder(String line, int i) {
-        if (line.equals("ORDER")) {
-            //everything is okey
-        } else {
-            //throw type 2 exception
-            System.out.println("no order");
+    private static void validateOrder(String line, int i) throws OrderError {
+        if (!line.equals("ORDER")) {
+            throw new OrderError();
         }
 
 
     }
 
-    private static Filterable interpretFilter(String line, int i) {
+    private static Filterable interpretFilter(String line, int i) throws IOException {
         if (line.matches("greater_than#((\\d)+(\\.\\d+)?)")) {
             String stringValue = line.split("#")[1];
             double value = Double.valueOf(stringValue);
@@ -116,16 +151,15 @@ public class SectionFactory {
             return new permissionFilter(Filterable.filterType.HIDDEN, stringValue);
 
         } else if (line.matches("all")) {
-
+            return new allFilter();
         }
-        return new allFilter();
+        throw new IOException();
+
     }
 
-    private static void validateFilter(String line, int i) {
-        if (line.equals("FILTER")) {
-        } else {
-            //exeption
-            System.out.println("no filter");
+    private static void validateFilter(String line, int i) throws FilterError {
+        if (!line.equals("FILTER")) {
+            throw new FilterError();
         }
     }
 
