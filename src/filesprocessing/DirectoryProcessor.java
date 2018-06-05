@@ -19,14 +19,25 @@ public class DirectoryProcessor {
      * @param args the source directory (at args[0]) and command file (at args[1])
      */
     public static void main(String[] args) {
+
+
+
         File sourcedir = new File(args[0]);
         File cmdFile = new File(args[1]);
-        LinkedList<Section> Sections = SectionFactory.parse(cmdFile);
+        try {
+            LinkedList<Section> Sections = SectionFactory.parse(cmdFile);
+            while (!Sections.isEmpty()) {
+                Section s = Sections.removeFirst();
+                printSection(s, sourcedir);
+            }
+        }catch (SectionFactory.OrderError error){
+            System.err.println("ERROR: ORDER subsection is missing or not written correctly");
+        }catch (SectionFactory.FilterError error){
+            System.err.println("ERROR: FILTER subsection is missing or not written correctly");
+        } catch (SectionFactory.Type2Error error) {
 
-        while (!Sections.isEmpty()) {
-            Section s = Sections.removeFirst();
-            printSection(s, sourcedir);
         }
+
     }
 
     /**

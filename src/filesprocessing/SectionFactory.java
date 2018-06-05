@@ -12,8 +12,8 @@ import java.util.Scanner;
 
 
 public class SectionFactory {
-    public static final int LINESPERSECTION = 4;
-
+    private static final int LINESPERSECTION = 4;
+    private static final String BUFFERSTRING = "***AUTOMATIC_BUFFER***";
 
     public static class Type2Error extends IOException {
     }
@@ -37,52 +37,73 @@ public class SectionFactory {
          * this buffer is created in order to force the number of rows to be 4. that way any missing segments
          * of the command file will be noticed
          */
-        for (int j=0; j<LINESPERSECTION-1-(len+LINESPERSECTION-1)%LINESPERSECTION;j++){
-            buffer.add("");
-        }
-        rawtext.addAll(buffer);
+//        for (int j = 0; j < LINESPERSECTION - 1 - (len + LINESPERSECTION - 1) % LINESPERSECTION; j++) {
+//            buffer.add(BUFFERSTRING);
+//        }
+//        rawtext.addAll(buffer);
 
-        int i = 1;
+        len = rawtext.size();
+        int linecount = 1;//counts the lines
+        int part = 1;//holds the current part that we are now parsing, can be:1-FILTER, 2-filter content, 3-ORDER, 4-
+        //order content
         Filterable filter = null;
         Comparator<File> order;
         for (String line : rawtext) {
-            int linenum = i%LINESPERSECTION; //this variable saves the part is the section that is being currently
+            int linenum = part % LINESPERSECTION; //this variable saves the part is the section that is being currently
             //obsereved
-            if (linenum== 1) {
-                validateFilter(line, i);
-            } else if (linenum == 2) {
+            if (linenum == 1) {
+                validateFilter(line);
+                if(linecount==len) {
+                    throw new OrderError();
+                }
+                } else if (linenum == 2) {
+                if(linecount==len) {
+                    throw new OrderError();
+                }
                 try {
-                    filter = interpretFilter(line, i);
+                    filter = interpretFilter(line);
                 } catch (IOException e) {
-                    System.err.println("Warning in line " + i);
-                    filter = new allFilter();
+                    System.err.println("Warning in line " + linecount);
+                    filter = getDeafaultFilter();
                 }
             } else if (linenum == 3) {
-                validateOrder(line, i);
+                validateOrder(line);
+                if(linecount==len){
+                    order=getDeafaultComparator();
+                    lst.add(new Section(filter, order));
+                }
             } else if (linenum == 0) {
-                try {
-                    order = interpretOrder(line, i);
-                } catch (IOException error) {
-                    System.err.println("Warning in line " + i);
-                    order = Orders.absComparator();
+                if (line.equals(BUFFERSTRING)) {
+                    order = getDeafaultComparator();
+                } else if(line.equals("FILTER")) {
+                    order = getDeafaultComparator();
+                    part++;
+                }else{
+                    try {
+                        order = interpretOrder(line);
+                    } catch (IOException error) {
+                        System.err.println("Warning in line " + linecount);
+                        order = getDeafaultComparator();
+                    }
                 }
                 lst.add(new Section(filter, order));
-            }
-            else{
+            } else {
                 //if in the future more segemets will be present in each section
             }
-            i++;
+            linecount++;
+            part++;
         }
+
         return lst;
 
 
     }
 
-    private static Comparator<File> interpretOrder(String line, int i) throws IOException {
+    private static Comparator<File> interpretOrder(String line) throws IOException {
         if (line.matches(".*#REVERSED")) {
             int j = line.indexOf("#REVERSED");
             String newline = line.substring(0, j);
-            return interpretOrder(newline, i).reversed();
+            return interpretOrder(newline).reversed();
         } else {
             if (line.matches("abs")) {
                 return Orders.absComparator();
@@ -95,7 +116,7 @@ public class SectionFactory {
         throw new IOException();
     }
 
-    private static void validateOrder(String line, int i) throws OrderError {
+    private static void validateOrder(String line) throws OrderError {
         if (!line.equals("ORDER")) {
             throw new OrderError();
         }
@@ -103,66 +124,81 @@ public class SectionFactory {
 
     }
 
-    private static Filterable interpretFilter(String line, int i) throws IOException {
-        if (line.matches("greater_than#((\\d)+(\\.\\d+)?)")) {
-            String stringValue = line.split("#")[1];
-            double value = Double.valueOf(stringValue);
-            return new numbersFilter(Filterable.filterType.GREATER_THAN, value);
-        } else if (line.matches("between#((\\d)+(\\.\\d+)?)#((\\d)+(\\.\\d+)?)")) {
+    private static Filterable interpretFilter(String line) throws IOException {
+        if (line.matches(".*#NOT")) {
+            int j = line.indexOf("#NOT");
+            String newline = line.substring(0, j);
+            return new negateFilter(interpretFilter(newline));
+        } else {
 
-            String stringValue1 = line.split("#")[1];
-            double value1 = Double.valueOf(stringValue1);
-            String stringValue2 = line.split("#")[2];
-            double value2 = Double.valueOf(stringValue2);
+            if (line.matches("greater_than#((\\d)+(\\.\\d+)?)")) {
+                String stringValue = line.split("#")[1];
+                double value = Double.valueOf(stringValue);
+                return new numbersFilter(Filterable.filterType.GREATER_THAN, value);
+            } else if (line.matches("between#((\\d)+(\\.\\d+)?)#((\\d)+(\\.\\d+)?)")) {
 
-            if (value1 < value2 & 0 < value1)
-                return new numbersFilter(Filterable.filterType.BETWEEN, value1, value2);
-        } else if (line.matches("smaller_than#((\\d)+(\\.\\d+)?)")) {
-            String stringValue = line.split("#")[1];
-            double value = Double.valueOf(stringValue);
-            return new numbersFilter(Filterable.filterType.SMALLER_THAN, value);
+                String stringValue1 = line.split("#")[1];
+                double value1 = Double.valueOf(stringValue1);
+                String stringValue2 = line.split("#")[2];
+                double value2 = Double.valueOf(stringValue2);
 
-        } else if (line.matches("file#[\\w\\s/\\-\\.]+")) {
-            String stringValue = line.split("#")[1];
-            return new stringFilters(Filterable.filterType.FILE, stringValue);
+                if (value1 < value2 & 0 < value1)
+                    return new numbersFilter(Filterable.filterType.BETWEEN, value1, value2);
+            } else if (line.matches("smaller_than#((\\d)+(\\.\\d+)?)")) {
+                String stringValue = line.split("#")[1];
+                double value = Double.valueOf(stringValue);
+                return new numbersFilter(Filterable.filterType.SMALLER_THAN, value);
 
-        } else if (line.matches("contains#((\\d)+(\\.\\d+)?)")) {
-            String stringValue = line.split("#")[1];
-            return new stringFilters(Filterable.filterType.CONTAINS, stringValue);
+            } else if (line.matches("file#[\\w\\s/\\-\\.]+")) {
+                String stringValue = line.split("#")[1];
+                return new stringFilters(Filterable.filterType.FILE, stringValue);
 
-        } else if (line.matches("prefix#((\\d)+(\\.\\d+)?)")) {
-            String stringValue = line.split("#")[1];
-            return new stringFilters(Filterable.filterType.PREFIX, stringValue);
+            } else if (line.matches("contains#((\\d)+(\\.\\d+)?)")) {
+                String stringValue = line.split("#")[1];
+                return new stringFilters(Filterable.filterType.CONTAINS, stringValue);
 
-        } else if (line.matches("suffix#((\\d)+(\\.\\d+)?)")) {
-            String stringValue = line.split("#")[1];
-            return new stringFilters(Filterable.filterType.SUFFIX, stringValue);
+            } else if (line.matches("prefix#((\\d)+(\\.\\d+)?)")) {
+                String stringValue = line.split("#")[1];
+                return new stringFilters(Filterable.filterType.PREFIX, stringValue);
 
-        } else if (line.matches("writable#(YES|NO)")) {
-            String stringValue = line.split("#")[1];
-            return new permissionFilter(Filterable.filterType.WRITABLE, stringValue);
+            } else if (line.matches("suffix#((\\d)+(\\.\\d+)?)")) {
+                String stringValue = line.split("#")[1];
+                return new stringFilters(Filterable.filterType.SUFFIX, stringValue);
 
-        } else if (line.matches("executable#(YES|NO)")) {
-            String stringValue = line.split("#")[1];
-            return new permissionFilter(Filterable.filterType.EXECUTABLE, stringValue);
+            } else if (line.matches("writable#(YES|NO)")) {
+                String stringValue = line.split("#")[1];
+                return new permissionFilter(Filterable.filterType.WRITABLE, stringValue);
 
-        } else if (line.matches("hidden#(YES|NO)")) {
-            String stringValue = line.split("#")[1];
-            return new permissionFilter(Filterable.filterType.HIDDEN, stringValue);
+            } else if (line.matches("executable#(YES|NO)")) {
+                String stringValue = line.split("#")[1];
+                return new permissionFilter(Filterable.filterType.EXECUTABLE, stringValue);
 
-        } else if (line.matches("all")) {
-            return new allFilter();
+            } else if (line.matches("hidden#(YES|NO)")) {
+                String stringValue = line.split("#")[1];
+                return new permissionFilter(Filterable.filterType.HIDDEN, stringValue);
+
+            } else if (line.matches("all")) {
+                return new allFilter();
+            }
+            throw new IOException();
+
         }
-        throw new IOException();
 
     }
 
-    private static void validateFilter(String line, int i) throws FilterError {
+    private static void validateFilter(String line) throws FilterError {
         if (!line.equals("FILTER")) {
             throw new FilterError();
         }
     }
 
+    private static Comparator<File> getDeafaultComparator() {
+        return Orders.absComparator();
+    }
+
+    private static Filterable getDeafaultFilter() {
+        return new allFilter();
+    }
 
     public static LinkedList<String> fileToString(File file) {
         /**
