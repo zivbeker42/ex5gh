@@ -1,4 +1,4 @@
-package filesprocessing.filters;
+package filters;
 
 import java.io.File;
 
@@ -34,6 +34,7 @@ public class permissionFilter implements Filterable {
             return file.canExecute() == value;
         }
         if (this.type == Filterable.filterType.WRITABLE) {
+            System.out.println((file.canWrite()));
             return file.canWrite() == value;
         }
         if (this.type == Filterable.filterType.HIDDEN) {

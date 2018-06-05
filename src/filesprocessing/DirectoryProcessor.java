@@ -1,7 +1,9 @@
 package filesprocessing;
 
+import filters.FilterException;
+import orderTypes.OrderException;
+
 import java.io.File;
-import java.io.IOException;
 import java.util.LinkedList;
 
 
@@ -18,25 +20,42 @@ public class DirectoryProcessor {
      *
      * @param args the source directory (at args[0]) and command file (at args[1])
      */
-    public static void main(String[] args) {
 
+    private static final String ERRORSTRING = "ERROR";
+    private static final String ORDERSTRING = "ORDER";
+    private static final String FILTERSTRING = "FILTER";
+    private static final String MESSAGE = "subsection is missing or not written correctly";
+    private static final String MESSAGEARGS = "there should be only two args";
+    private static final String MESSAGEFILES = "Files paths are missing or corrupted";
 
+    public static void main(String[] args) throws Type2Exception{
 
-        File sourcedir = new File(args[0]);
-        File cmdFile = new File(args[1]);
-        try {
-            LinkedList<Section> Sections = SectionFactory.parse(cmdFile);
-            while (!Sections.isEmpty()) {
-                Section s = Sections.removeFirst();
-                printSection(s, sourcedir);
-            }
-        }catch (SectionFactory.OrderError error){
-            System.err.println("ERROR: ORDER subsection is missing or not written correctly");
-        }catch (SectionFactory.FilterError error){
-            System.err.println("ERROR: FILTER subsection is missing or not written correctly");
-        } catch (SectionFactory.Type2Error error) {
-
+        if(args.length!=2){
+            System.err.println(MESSAGEARGS);
+            throw new ArgsException();
         }
+
+        try {
+            File sourcedir = new File(args[0]);
+            File cmdFile = new File(args[1]);
+            try {
+                LinkedList<Section> sections = SectionFactory.parse(cmdFile);
+                for (Section s :sections) {
+                    printSection(s, sourcedir);
+                }
+            }catch (OrderException error){
+                System.err.println(ERRORSTRING+" "+ ORDERSTRING+" "+MESSAGE);
+            }catch (FilterException error){
+                System.err.println(ERRORSTRING+" "+ FILTERSTRING+" "+MESSAGE);
+            } catch (Type2Exception error) {
+                System.err.println("failed to open files");
+            }
+        }catch (Exception e){
+            System.err.println(MESSAGEFILES);
+            throw new Type2Exception();
+        }
+
+
 
     }
 
@@ -53,7 +72,8 @@ public class DirectoryProcessor {
         File[] dirFiles = directory.listFiles();
         if (dirFiles == null)
             return;
-        LinkedList<File> Filtered = new LinkedList<File>();
+        LinkedList<File> Filtered;
+        Filtered = new LinkedList<>();
         for (File file : dirFiles) {
             if (s.getFilter().filter(file)) {
                 Filtered.add(file);

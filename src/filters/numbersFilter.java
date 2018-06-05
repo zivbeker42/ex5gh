@@ -1,4 +1,4 @@
-package filesprocessing.filters;
+package filters;
 
 import java.io.File;
 
@@ -51,6 +51,6 @@ public class numbersFilter implements Filterable{
 
     @Override
     public boolean filter(File file) {
-        return  (double) (file.length()/1024) >= minValue & (double) (file.length()/1024) <= maxValue;
+        return  (double) (file.length()/1024.0) >= minValue & (double) (file.length()/1024.0) <= maxValue;
     }
 }

@@ -22,7 +22,7 @@ public class Type1Exception extends Exception{
      * prints the exception.
      */
     public void print() {
-        System.err.print(message+line);
+        System.err.println(message+line);
     }
 
 

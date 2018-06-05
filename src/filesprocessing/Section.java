@@ -1,5 +1,5 @@
 package filesprocessing;
-import filesprocessing.filters.Filterable;
+import filters.Filterable;
 
 import java.io.File;
 import java.util.Comparator;
