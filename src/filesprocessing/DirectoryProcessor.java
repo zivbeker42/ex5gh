@@ -48,6 +48,7 @@ public class DirectoryProcessor {
      */
     private static void printSection(Section s, File directory) {
 
+        printWarnings(s);
         // create filtered files
         File[] dirFiles = directory.listFiles();
         if (dirFiles == null)
@@ -68,5 +69,12 @@ public class DirectoryProcessor {
             Filtered.removeFirst();
         }
 
+    }
+
+    private static void printWarnings(Section s){
+        while(!s.getErrors().isEmpty()){
+            s.getErrors().getFirst().print();
+            s.getErrors().removeFirst();
+        }
     }
 }
