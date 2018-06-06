@@ -16,12 +16,17 @@ stringFilter - A class implementing a filter that is described by a string check
 it is responsible for file, contains, prefix, suffix filter.
 negateFilter - filter which negates any other filter.
 
+OrderTypes package:
+OrderException - A class implementing an order exception.
+Orders - A class containing the different comparators.
 
-SectionFactory - class is a static class that hansles the parsing of the command file.
-it's main method is parse which reads the command file and returns a linkedlist of Section object that contains
-all the neccessary data for the program to run.
+filesprocessing package:
+ArgsException - A class implementing an arguments exception.
+DirectoryProcessor - A class which handles the whole process of a directory by a given command file.
+Section - A class representing a section.
 
-
+Type1Exception - A class implementing a type1 exception.
+Type2Exception - A class implementing a type2 exception.
 
 
 =============================

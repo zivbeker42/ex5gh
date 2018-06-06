@@ -1,7 +1,7 @@
 package filesprocessing;
 
 /**
- * A class representing a type1 exception.
+ * A class implementing a type1 exception.
  */
 public class Type1Exception extends Exception{
 
