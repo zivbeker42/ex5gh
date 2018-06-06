@@ -39,6 +39,7 @@ public class permissionFilter implements Filterable {
         if (this.type == Filterable.filterType.HIDDEN) {
             return file.isHidden() == value;
         }
+
         return false;
     }
 }
