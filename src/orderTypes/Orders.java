@@ -23,7 +23,20 @@ public class Orders {
      * @return type comparator
      */
     public static Comparator<File> typeComparator() {
-        return (file1, file2) -> getType(file1).compareTo(getType(file2));
+
+        return new Comparator<File>() {
+            @Override
+            public int compare(File file1, File file2) {
+                String type1 = getType(file1);
+                String type2 = getType(file2);
+                if (!type1.equals(type2)) {
+                    return type1.compareTo(type2);
+                } else {
+                    return absComparator().compare(file1, file2);
+                }
+            }
+        };
+//        return (file1, file2) -> getType(file1).compareTo(getType(file2));
     }
 
     /**
@@ -37,7 +50,11 @@ public class Orders {
             public int compare(File file1, File file2) {
                 Long l1 = file1.length();
                 Long l2 = file2.length();
-                return l1.compareTo(l2);
+                if (l1 != l2) {
+                    return l1.compareTo(l2);
+                } else {
+                    return absComparator().compare(file1, file2);
+                }
             }
         };
     }

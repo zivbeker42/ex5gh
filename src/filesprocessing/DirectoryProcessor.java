@@ -69,13 +69,14 @@ public class DirectoryProcessor {
 
         printWarnings(s);
         // create filtered files
+
         File[] dirFiles = directory.listFiles();
         if (dirFiles == null)
             return;
         LinkedList<File> Filtered;
         Filtered = new LinkedList<>();
         for (File file : dirFiles) {
-            if (s.getFilter().filter(file)) {
+            if (s.getFilter().filter(file) && file.isFile()) {
                 Filtered.add(file);
             }
         }
@@ -85,7 +86,8 @@ public class DirectoryProcessor {
 
         //print by order
         for (File file : Filtered) {
-            System.out.println(file.getName());
+            System.out.print(file.getName());
+            System.out.println(file.length());
         }
 
     }
