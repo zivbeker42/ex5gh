@@ -86,8 +86,7 @@ public class DirectoryProcessor {
 
         //print by order
         for (File file : Filtered) {
-            System.out.print(file.getName());
-            System.out.println(file.length());
+            System.out.println(file.getName());
         }
 
     }

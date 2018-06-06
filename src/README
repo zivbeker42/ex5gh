@@ -35,9 +35,34 @@ Type2Exception - A class implementing a type2 exception.
 =          Design           =
 =============================
 
-Modularity, the Factory
-design pattern, Single Choice priniciple
+the design we chose is as follows:
+the main class DirectoryProcessor calles a number of methods. the first call is to parse method of the sectionFactory
+class. this class is responsible for the parsing of the command file. it provides the necessary environment for running
+the parse() method. parse returns a list of Section objects.
+A section is an object that has three fields:
+1. Filterable
+the interface we defined for doing the filtering operations. in the parsing part of the program we create classes that
+implement this interface. the subclasses are each defined to a certain domain of the filtering action. this includes
+filters that handle numbers comparisons, naming comparisons, premission checking and more.
 
+2. Comparator<File>
+different implementaions of the comparator interfaces
+
+##for the NOT cases in the filter parts, decorators are used to implement the negation.
+the relevant decorator class is negateFilter.
+##the negation in the Order parts is done with the .reverse() method of the Comparator object.
+
+3. Type1Error
+type1errors are the errors that occur when there is bad input where the filters and orders should be specified. the
+exceptions will be caught and the program will continue to run. each section has a list of errors so they could all be
+printed in the necessary part of the program.
+
+Other design issues;
+errors:
+as explained above, there are type1error object which are handled in runtime.
+there is also a more complex structure of Type2Error. the Type2Error is the parent class for this case. it extends
+IOException. it has three subclasses: OrderException, FilterException and ArgsException. the three are throwen in three
+are thrown in cases where there is a bad ORDER text, bad FILTER text or the wrong number of arguments respectively.
 
 =============================
 =  Implementation details   =
