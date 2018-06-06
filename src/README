@@ -24,7 +24,9 @@ filesprocessing package:
 ArgsException - A class implementing an arguments exception.
 DirectoryProcessor - A class which handles the whole process of a directory by a given command file.
 Section - A class representing a section.
-
+SectionFactory - Section factory class is a static class that handles the parsing of the command file. it's
+main method is parse which reads the command file and returns a linked list of Section object that contains
+all the neccessary data for the program to run.
 Type1Exception - A class implementing a type1 exception.
 Type2Exception - A class implementing a type2 exception.
 
@@ -33,106 +35,10 @@ Type2Exception - A class implementing a type2 exception.
 =          Design           =
 =============================
 
-
+Modularity, the Factory
+design pattern, Single Choice priniciple
 
 
 =============================
 =  Implementation details   =
 =============================
-OpenHashSet: I implemented it as an array of linked list(wrapper)s.
-ClosedHashSet Deletion: I used a StringWrapper class which delegates a string and can change the state
-						of this string to selected or not. in this way there are no nulls in the hash table
-						and i can recognize between a deleted cell a taken cell or a cell that hasn"t been
-						used at all.
-Warm Up Phase: 200 iterations.
-
-
-=============================
-Results of the analysis
-=============================
-1. data1.txt insertion times: OpenHashSet:97692
-                            ClosedHashSet:282978
-                            *TreeSet:66*
-                            LinkedList:42998
-                            *HashSet:66*
-
-2. data2.txt insertion times: OpenHashSet = 39588038
-                            ClosedHashSet = 3131622
-                            TreeSet = 3395337
-                            LinkedList = 2087480634
-                            *HashSet = 1477651*
-
-3. insertion    data1.txt   data2.txt
-OpenHashSet     97692       39588038
-ClosedHashSet   282978      3131622
-TreeSet         66          3395337
-LinkedList      42998       2087480634
-HashSet         66          1477651
-
-4. data1.txt contains("hi"): OpenHashSet: 1848484
-                             ClosedHashSet: 15
-                             TreeSet_Contains: 98
-                             LinkedList_Contains: 690273
-                             *HashSet: 8*
-5. data1.txt  contains(“-13170890158”): OpenHashSet:1958822
-                                        ClosedHashSet: 5815166
-                                        TreeSet: 147
-                                        LinkedList: 765879
-                                        *HashSet: 23*
-6. (data1.txt)      hi          -13170890158
-OpenHashSet         1848484      1958822
-ClosedHashSet       15           5815166
-TreeSet_Contains    98           147
-LinkedList_Contains 690273       765879
-HashSet             8            23
-
-7. data2.txt contains("hi"): OpenHashSet: 2390008
-                             ClosedHashSet: 30
-                             TreeSet: 81
-                             LinkedList: 603782
-                             *HashSet: 9*
-8. data2.txt  contains(“23”): OpenHashSet: 3622
-                              *ClosedHashSet: 14*
-                              TreeSet: 39
-                              LinkedList: 117
-                              HashSet: 51
-9. (data2.txt)      hi          23
-OpenHashSet         2390008     3622
-ClosedHashSet       30          14
-TreeSet_Contains    81          39
-LinkedList_Contains 603782      117
-HashSet             9           51
-
-=============================
-Results discussion
-=============================
-1. Bad results for data1.txt:   OpenHashSet:    When you enter values with the same hashcode it effectively
-                                                turns into a list and inserting items in an O(1) runtime.
-                                ClosedHashSet:  When you enter values with the same hashcode it has to iterate
-                                                for a long time to find values that were entered late (O(size)
-                                                 complexity).
-2.  OpenHashSet     Strengths: easily inserting values.
-                    Weaknesses: having trouble with finding elements that have a lot of other elements with
-                    the same hash code.
-                    Where I would use it: Sets with evenly distributed hash values.
-    ClosedHashSet   Strengths: easily finds and inserts elements with evenly distributed hash values
-                    Weaknesses: finding and inserting elements with the same hash values as a lot of others.
-                    Where I would use it: Sets with evenly distributed hash values
-    TreeSet         Strengths: Adding elements with the same hash code.
-                    Weaknesses: Adding elements with evenly distributed hash values.
-                    Where I would use it: When I need to find and search many values when there are a lot of
-                    items with the same hash code.
-    LinkedList      Strengths: should add elements very easily (but I don"t see this in my results)
-                    Weaknesses: finding elements.
-                    Where I would use it: when I need to add and remove items in a LIFO way.
-    HashSet         Strengths: practically everything
-                    Weaknesses: couldn't find any
-                    Where I would use it: Always (when the operations I need are add and contains, of course)
-
-3. OpenHashSet vs ClosedHashSet: Close was better in most "contains" operations (especially on data 2),
-                                 insertion data 1 was easier for Open and Close was faster with data 2.
-4. Java HashSet vs my HashSets: Java's was better by a very large factor almost every test.
-5. I was expecting for this results actually but I was surprised by the time it would for my hashsets to do
-the given actions( I thought it would take much less time) and by time hashset did all of the actions.
-6. Java HashSet performance: I expected the hash set to be better than else but not by this big difference.
-7. I used only one clamping method as explained in the exercise.
