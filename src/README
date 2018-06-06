@@ -17,6 +17,11 @@ it is responsible for file, contains, prefix, suffix filter.
 negateFilter - filter which negates any other filter.
 
 
+SectionFactory - class is a static class that hansles the parsing of the command file.
+it's main method is parse which reads the command file and returns a linkedlist of Section object that contains
+all the neccessary data for the program to run.
+
+
 
 
 =============================
