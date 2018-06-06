@@ -137,14 +137,6 @@ public class SectionFactory {
         throw new Type1Exception(linenum);
     }
 
-    private static void validateOrder(String line) throws OrderException {
-        if (!line.equals(ORDER)) {
-            throw new OrderException();
-        }
-
-
-    }
-
 
     /**
      * this function reads a line and returns an interpretation of the line. it tries to read the line assuming it
@@ -181,19 +173,19 @@ public class SectionFactory {
                 double value = Double.valueOf(stringValue);
                 return new numbersFilter(Filterable.filterType.SMALLER_THAN, value);
 
-            } else if (line.matches("file#[\\w\\s/\\-\\.]+")) {
+            } else if (line.matches("file#[\\w\\s/\\-.]+")) {
                 String stringValue = line.split("#")[1];
                 return new stringFilters(Filterable.filterType.FILE, stringValue);
 
-            } else if (line.matches("contains#[\\w\\s/\\-\\.]+")) {
+            } else if (line.matches("contains#[\\w\\s/\\-.]+")) {
                 String stringValue = line.split("#")[1];
                 return new stringFilters(Filterable.filterType.CONTAINS, stringValue);
 
-            } else if (line.matches("prefix#[\\w\\s/\\-\\.]+")) {
+            } else if (line.matches("prefix#[\\w\\s/\\-.]+")) {
                 String stringValue = line.split("#")[1];
                 return new stringFilters(Filterable.filterType.PREFIX, stringValue);
 
-            } else if (line.matches("suffix#[\\w\\s/\\-\\.]+")) {
+            } else if (line.matches("suffix#[\\w\\s/\\-.]+")) {
                 String stringValue = line.split("#")[1];
                 return new stringFilters(Filterable.filterType.SUFFIX, stringValue);
 
@@ -218,12 +210,31 @@ public class SectionFactory {
 
     }
 
+    /**
+     * the function validates that the line contains only the correct text for the FILTER part and throws an error other
+     * wise
+     * @param line the line to validate
+     * @throws FilterException
+     */
     private static void validateFilter(String line) throws FilterException {
         if (!line.equals(FILTER)) {
             throw new FilterException();
         }
     }
 
+    /**
+     * the function validates that the line contains only the correct text for the ORDER part and throws an error other
+     * wise
+     * @param line the line to validate
+     * @throws OrderException
+     */
+    private static void validateOrder(String line) throws OrderException {
+        if (!line.equals(ORDER)) {
+            throw new OrderException();
+        }
+    }
+
+    //the default section component in the case where there is an error
     private static Comparator<File> getDeafaultComparator() {
         return Orders.absComparator();
     }
@@ -232,6 +243,11 @@ public class SectionFactory {
         return new allFilter();
     }
 
+    /**
+     * this fucntion recieves a file object and return its text in the form of a linked list of strings
+     * @param file the file to read
+     * @return a linked list of strings that are the lines of the text files
+     */
     private static LinkedList<String> fileToString(File file) {
         LinkedList<String> lst = new LinkedList<>();
 
